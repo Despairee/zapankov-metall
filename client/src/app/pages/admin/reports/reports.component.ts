@@ -582,7 +582,17 @@ export class ReportsComponent {
         URL.revokeObjectURL(url);
         this.exporting.set(false);
       },
-      error: () => this.exporting.set(false),
+      error: (err) => {
+        this.exporting.set(false);
+        if (err?.error instanceof Blob) {
+          err.error.text().then((text: string) => {
+            try { alert('Ошибка экспорта: ' + JSON.parse(text).error); }
+            catch { alert('Ошибка экспорта: ' + text); }
+          });
+        } else {
+          alert('Ошибка экспорта: ' + (err?.error?.error || err?.message || 'Неизвестная ошибка'));
+        }
+      },
     });
   }
 

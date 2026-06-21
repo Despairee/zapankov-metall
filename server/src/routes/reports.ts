@@ -3,6 +3,7 @@ import { authMiddleware, AuthRequest } from '../middleware/auth';
 import ExcelJS from 'exceljs';
 import PDFDocument from 'pdfkit';
 import path from 'path';
+import fs from 'fs';
 import prisma from '../prisma';
 
 const router = Router();
@@ -316,50 +317,59 @@ router.get('/export', async (req: AuthRequest, res: Response): Promise<void> => 
     res.end();
 
   } else {
-    const doc = new PDFDocument({ margin: 40, size: 'A4', layout: 'landscape' });
-    try {
-      doc.registerFont('DejaVu', FONT_PATH);
-      doc.font('DejaVu');
-    } catch {
-      doc.font('Helvetica');
+    if (!fs.existsSync(FONT_PATH)) {
+      res.status(500).json({ error: 'Шрифт для PDF не найден' });
+      return;
     }
 
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="${reportType}_${Date.now()}.pdf"`);
-    doc.pipe(res);
+    try {
+      const doc = new PDFDocument({ margin: 40, size: 'A4', layout: 'landscape' });
+      doc.registerFont('DejaVu', FONT_PATH);
+      doc.font('DejaVu');
 
-    doc.fontSize(16).text(title, { align: 'left' });
-    doc.fontSize(10).fillColor('#888888').text(dateLabel).fillColor('#000000');
-    doc.moveDown(0.5);
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="${reportType}_${Date.now()}.pdf"`);
+      doc.pipe(res);
 
-    const pageWidth = doc.page.width - 80;
-    const colWidth = Math.floor(pageWidth / columns.length);
-    const rowHeight = 20;
-    let y = doc.y;
+      doc.fontSize(16).text(title, { align: 'left' });
+      doc.fontSize(10).fillColor('#888888').text(dateLabel).fillColor('#000000');
+      doc.moveDown(0.5);
 
-    doc.fontSize(9).fillColor('#ffffff');
-    doc.rect(40, y, pageWidth, rowHeight).fill('#1a1a2e');
-    columns.forEach((col, i) => {
-      doc.fillColor('#ffffff').text(col, 40 + i * colWidth, y + 5, { width: colWidth - 4, lineBreak: false });
-    });
-    y += rowHeight;
+      const pageWidth = doc.page.width - 80;
+      const colWidth = Math.floor(pageWidth / columns.length);
+      const rowHeight = 20;
+      let y = doc.y;
 
-    doc.fontSize(8).fillColor('#000000');
-    rows.forEach((row, ri) => {
-      if (y > doc.page.height - 80) { doc.addPage(); y = 40; }
-      if (ri % 2 === 0) doc.rect(40, y, pageWidth, rowHeight).fill('#f5f5f5');
-      doc.fillColor('#000000');
-      row.forEach((cell, i) => {
-        doc.text(String(cell), 40 + i * colWidth, y + 4, { width: colWidth - 4, lineBreak: false });
+      doc.fontSize(9).fillColor('#ffffff');
+      doc.rect(40, y, pageWidth, rowHeight).fill('#1a1a2e');
+      columns.forEach((col, i) => {
+        doc.fillColor('#ffffff').text(col, 40 + i * colWidth, y + 5, { width: colWidth - 4, lineBreak: false });
       });
       y += rowHeight;
-    });
 
-    doc.fontSize(8).fillColor('#888888')
-      .text(`Сформировано: ${new Date().toLocaleString('ru-RU')} | Всего записей: ${rows.length}`,
-        40, doc.page.height - 40, { align: 'left' });
+      doc.fontSize(8).fillColor('#000000');
+      rows.forEach((row, ri) => {
+        if (y > doc.page.height - 80) { doc.addPage(); y = 40; }
+        if (ri % 2 === 0) doc.rect(40, y, pageWidth, rowHeight).fill('#f5f5f5');
+        doc.fillColor('#000000');
+        row.forEach((cell, i) => {
+          doc.text(String(cell), 40 + i * colWidth, y + 4, { width: colWidth - 4, lineBreak: false });
+        });
+        y += rowHeight;
+      });
 
-    doc.end();
+      doc.fontSize(8).fillColor('#888888')
+        .text(`Сформировано: ${new Date().toLocaleString('ru-RU')} | Всего записей: ${rows.length}`,
+          40, doc.page.height - 40, { align: 'left' });
+
+      doc.end();
+    } catch (e: any) {
+      if (!res.headersSent) {
+        res.status(500).json({ error: e.message || 'Ошибка генерации PDF' });
+      } else {
+        res.end();
+      }
+    }
   }
 });
 
