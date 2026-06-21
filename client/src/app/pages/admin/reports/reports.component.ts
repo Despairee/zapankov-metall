@@ -574,12 +574,16 @@ export class ReportsComponent {
     this.api.exportReport(params.type, params.format, this.buildParams()).subscribe({
       next: (blob) => {
         const ext = this.fileFormat();
-        const url = URL.createObjectURL(blob);
+        const file = new Blob([blob], { type: ext === 'pdf' ? 'application/pdf' : blob.type });
+        const url = URL.createObjectURL(file);
         const a = document.createElement('a');
         a.href = url;
         a.download = `${reportKey}_${this.dateFrom()}_${this.dateTo()}.${ext}`;
+        a.style.display = 'none';
+        document.body.appendChild(a);
         a.click();
-        URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
         this.exporting.set(false);
       },
       error: (err) => {
