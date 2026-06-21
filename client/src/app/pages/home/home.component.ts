@@ -39,22 +39,6 @@ import { ApiService } from '../../core/services/api.service';
       </div>
     </section>
 
-    <section class="section" id="services">
-      <div class="container">
-        <p class="eyebrow">Услуги</p>
-        <h2 class="h2">Что мы делаем</h2>
-        <div class="services-grid">
-          @for (service of services; track service.num) {
-            <div class="service-card">
-              <span class="meta">{{ service.num }}</span>
-              <h3 class="h3">{{ service.title }}</h3>
-              <p class="service-desc">{{ service.desc }}</p>
-            </div>
-          }
-        </div>
-      </div>
-    </section>
-
     <section class="section" id="portfolio">
       <div class="container">
         <div class="section-header">
@@ -189,36 +173,6 @@ import { ApiService } from '../../core/services/api.service';
       }
     }
 
-    .services-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1px;
-      background: var(--border-soft);
-    }
-
-    .service-card {
-      background: var(--bg);
-      padding: var(--space-8);
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-3);
-      transition: background 0.3s ease;
-    }
-
-    .service-card:hover {
-      background: rgba(240, 240, 250, 0.03);
-    }
-
-    .service-card .meta {
-      margin-bottom: var(--space-2);
-    }
-
-    .service-desc {
-      color: var(--muted);
-      font-size: var(--text-sm);
-      line-height: 1.6;
-    }
-
     .portfolio-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -301,12 +255,6 @@ import { ApiService } from '../../core/services/api.service';
       margin-bottom: var(--space-4);
     }
 
-    @media (max-width: 1024px) {
-      .services-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
     @media (max-width: 768px) {
       .section {
         padding: 80px 0;
@@ -314,10 +262,6 @@ import { ApiService } from '../../core/services/api.service';
 
       .section .h2 {
         margin-bottom: 40px;
-      }
-
-      .services-grid {
-        grid-template-columns: 1fr;
       }
 
       .portfolio-grid {
@@ -370,12 +314,4 @@ export class HomeComponent implements OnInit {
     return this.categoryMap[cat] || cat;
   }
 
-  services = [
-    { num: '01', title: 'Ворота и калитки', desc: 'Распашные, откатные, с автоматикой. Кованые элементы, профлист, сэндвич-панели.' },
-    { num: '02', title: 'Лестницы', desc: 'Маршевые, винтовые, на косоурах. Для дома и улицы с перилами и ограждениями.' },
-    { num: '03', title: 'Навесы и козырьки', desc: 'Для автомобилей, террас, входных групп. Поликарбонат, профнастил, стекло.' },
-    { num: '04', title: 'Ограждения', desc: 'Заборы из профнастила, сетки, ковки. Перила для балконов и террас.' },
-    { num: '05', title: 'Металлокаркасы', desc: 'Каркасы для домов, пристроек, гаражей. Расчёт нагрузок, проектирование.' },
-    { num: '06', title: 'Индивидуальные изделия', desc: 'Мангалы, беседки, мебель. Любые изделия из металла по вашим чертежам.' },
-  ];
 }

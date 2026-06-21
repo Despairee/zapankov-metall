@@ -109,10 +109,10 @@ interface OrderVM {
       </table>
     </div>
 
-    <!-- ─── Detail overlay ─── -->
+
     <div class="overlay" [class.open]="detailOpen()" (click)="closeDetail()"></div>
 
-    <!-- ─── Detail panel ─── -->
+
     <div class="detail-panel" [class.open]="detailOpen()">
       @if (selectedOrder(); as order) {
         <div class="detail-panel-header">
@@ -130,7 +130,7 @@ interface OrderVM {
         </div>
 
         @if (!editMode()) {
-          <!-- View mode -->
+
           <div class="detail-panel-content">
             <div class="detail-section">
               <div class="detail-section-title">Информация о заказе</div>
@@ -199,7 +199,7 @@ interface OrderVM {
           </div>
 
         } @else {
-          <!-- Edit mode -->
+
           <div class="detail-panel-content">
             <div class="detail-section">
               <div class="detail-section-title">Редактирование заказа</div>
@@ -254,10 +254,10 @@ interface OrderVM {
       }
     </div>
 
-    <!-- ─── Create overlay ─── -->
+
     <div class="overlay" [class.open]="createOpen()" (click)="closeCreate()"></div>
 
-    <!-- ─── Create panel ─── -->
+
     <div class="detail-panel" [class.open]="createOpen()">
       <div class="detail-panel-header">
         <h2>Новый заказ</h2>
