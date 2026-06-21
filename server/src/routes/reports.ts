@@ -6,7 +6,7 @@ import path from 'path';
 import prisma from '../prisma';
 
 const router = Router();
-const FONT_PATH = path.join(__dirname, '..', 'fonts', 'DejaVuSans.ttf');
+const FONT_PATH = path.join(__dirname, '..', '..', 'src', 'fonts', 'DejaVuSans.ttf');
 
 router.use(authMiddleware);
 
@@ -270,7 +270,7 @@ router.get('/export', async (req: AuthRequest, res: Response): Promise<void> => 
     : new Date().toLocaleDateString('ru-RU');
 
   if (fileFormat === 'csv') {
-    const BOM = '﻿';
+    const BOM = '';
     const lines = [columns.join(';'), ...rows.map(r => r.join(';'))];
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
     res.setHeader('Content-Disposition', `attachment; filename="${reportType}_${Date.now()}.csv"`);
@@ -317,8 +317,12 @@ router.get('/export', async (req: AuthRequest, res: Response): Promise<void> => 
 
   } else {
     const doc = new PDFDocument({ margin: 40, size: 'A4', layout: 'landscape' });
-    doc.registerFont('DejaVu', FONT_PATH);
-    doc.font('DejaVu');
+    try {
+      doc.registerFont('DejaVu', FONT_PATH);
+      doc.font('DejaVu');
+    } catch {
+      doc.font('Helvetica');
+    }
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${reportType}_${Date.now()}.pdf"`);
